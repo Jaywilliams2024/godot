@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpacetimeDBIdentity" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		A 256-bit identity used by SpacetimeDB to identify users.
+	</brief_description>
+	<description>
+		SpacetimeDBIdentity wraps the 32-byte (256-bit) identity value that SpacetimeDB assigns to each connected user. Identities persist across connections and can be serialized as hex strings or raw bytes.
+	</description>
+	<tutorials>
+		<link title="SpacetimeDB Identity">https://spacetimedb.com/docs/intro/key-architecture#identity</link>
+	</tutorials>
+	<methods>
+		<method name="create_zero" qualifiers="static">
+			<return type="SpacetimeDBIdentity" />
+			<description>
+				Creates a zero (anonymous) identity with all bytes set to 0.
+			</description>
+		</method>
+		<method name="create_from_bytes" qualifiers="static">
+			<return type="SpacetimeDBIdentity" />
+			<param index="0" name="bytes" type="PackedByteArray" />
+			<description>
+				Creates an identity from raw bytes.
+			</description>
+		</method>
+		<method name="create_from_hex" qualifiers="static">
+			<return type="SpacetimeDBIdentity" />
+			<param index="0" name="hex" type="String" />
+			<description>
+				Creates an identity from a hex string representation.
+			</description>
+		</method>
+		<method name="is_zero">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if all bytes of the identity are zero.
+			</description>
+		</method>
+		<method name="is_equal">
+			<return type="bool" />
+			<param index="0" name="other" type="SpacetimeDBIdentity" />
+			<description>
+				Returns [code]true[/code] if this identity is equal to [param other].
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="data" type="PackedByteArray" setter="set_data" getter="get_data">
+			The raw 32-byte identity data.
+		</member>
+		<member name="hex_string" type="String" setter="set_hex_string" getter="get_hex_string">
+			The identity as a hexadecimal string.
+		</member>
+	</members>
+</class>

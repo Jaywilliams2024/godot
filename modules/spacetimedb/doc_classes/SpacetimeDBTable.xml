@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpacetimeDBTable" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		A client-side cache of a SpacetimeDB database table.
+	</brief_description>
+	<description>
+		SpacetimeDBTable stores the local copy of rows for a single SpacetimeDB table. Rows are kept in sync automatically when subscribed through [SpacetimeDBClient]. Each row is represented as a [Dictionary] with column names as keys. Signals are emitted when rows are inserted, deleted, or updated.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="add_column">
+			<return type="void" />
+			<param index="0" name="name" type="String" />
+			<param index="1" name="type" type="String" />
+			<description>
+				Adds a column definition. [param type] is one of: "bool", "u8", "i8", "u16", "i16", "u32", "i32", "u64", "i64", "f32", "f64", "string", "bytes", "identity", "connection_id".
+			</description>
+		</method>
+		<method name="insert_row">
+			<return type="void" />
+			<param index="0" name="row" type="Dictionary" />
+			<description>
+				Inserts a row into the local cache and emits [signal row_inserted].
+			</description>
+		</method>
+		<method name="delete_row">
+			<return type="void" />
+			<param index="0" name="row" type="Dictionary" />
+			<description>
+				Removes a matching row from the local cache and emits [signal row_deleted].
+			</description>
+		</method>
+		<method name="get_rows">
+			<return type="Array" />
+			<description>
+				Returns all rows currently in the cache as an Array of Dictionaries.
+			</description>
+		</method>
+		<method name="get_row_count">
+			<return type="int" />
+			<description>
+				Returns the number of rows in the cache.
+			</description>
+		</method>
+		<method name="find_by_primary_key">
+			<return type="Dictionary" />
+			<param index="0" name="key" type="Variant" />
+			<description>
+				Finds and returns a row by its primary key value, or an empty Dictionary if not found.
+			</description>
+		</method>
+		<method name="decode_row_bsatn">
+			<return type="Dictionary" />
+			<param index="0" name="data" type="PackedByteArray" />
+			<param index="1" name="offset" type="int" />
+			<description>
+				Decodes a single BSATN-encoded row from [param data] starting at [param offset], using the table's column schema.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="table_name" type="String" setter="set_table_name" getter="get_table_name">
+			The name of this table.
+		</member>
+		<member name="primary_key" type="String" setter="set_primary_key" getter="get_primary_key">
+			The column name used as the primary key for row lookups.
+		</member>
+	</members>
+	<signals>
+		<signal name="row_inserted">
+			<param index="0" name="row" type="Dictionary" />
+			<description>
+				Emitted when a row is inserted.
+			</description>
+		</signal>
+		<signal name="row_deleted">
+			<param index="0" name="row" type="Dictionary" />
+			<description>
+				Emitted when a row is deleted.
+			</description>
+		</signal>
+		<signal name="row_updated">
+			<param index="0" name="old_row" type="Dictionary" />
+			<param index="1" name="new_row" type="Dictionary" />
+			<description>
+				Emitted when a row is updated.
+			</description>
+		</signal>
+	</signals>
+</class>
