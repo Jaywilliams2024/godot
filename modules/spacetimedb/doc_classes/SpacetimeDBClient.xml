@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpacetimeDBClient" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Client for connecting to a SpacetimeDB database from Godot.
+	</brief_description>
+	<description>
+		SpacetimeDBClient provides a real-time WebSocket connection to a SpacetimeDB database. It handles the v1.json.spacetimedb or v1.bsatn.spacetimedb protocol, manages a local client-side cache of subscribed table rows, and allows calling server-side reducers.
+		Typical usage from GDScript:
+		[codeblock]
+		var client = SpacetimeDBClient.new()
+		client.connected.connect(_on_connected)
+		client.row_inserted.connect(_on_row_inserted)
+		client.connect_to_database("ws://localhost:3000", "my_database")
+
+		func _process(delta):
+		    client.poll()
+
+		func _on_connected(identity, token):
+		    client.subscribe(PackedStringArray(["SELECT * FROM person"]))
+
+		func _on_row_inserted(table_name, row):
+		    print("New row in ", table_name, ": ", row)
+		[/codeblock]
+	</description>
+	<tutorials>
+		<link title="SpacetimeDB C++ Quickstart">https://spacetimedb.com/docs/quickstarts/c-plus-plus</link>
+		<link title="SpacetimeDB Documentation">https://spacetimedb.com/docs</link>
+	</tutorials>
+	<methods>
+		<method name="connect_to_database">
+			<return type="int" enum="Error" />
+			<param index="0" name="host" type="String" />
+			<param index="1" name="database" type="String" />
+			<param index="2" name="token" type="String" default="&quot;&quot;" />
+			<description>
+				Opens a WebSocket connection to a SpacetimeDB server. [param host] is the server URI (e.g. "ws://localhost:3000"), [param database] is the database name or identity, and [param token] is an optional authentication token for reconnecting with the same identity.
+			</description>
+		</method>
+		<method name="disconnect_from_database">
+			<return type="void" />
+			<description>
+				Closes the WebSocket connection to the database.
+			</description>
+		</method>
+		<method name="poll">
+			<return type="void" />
+			<description>
+				Advances the connection by polling the WebSocket for incoming messages. This must be called every frame (e.g. in [code]_process[/code]) for the client to receive data.
+			</description>
+		</method>
+		<method name="call_reducer">
+			<return type="int" enum="Error" />
+			<param index="0" name="reducer_name" type="String" />
+			<param index="1" name="args" type="Array" default="[]" />
+			<description>
+				Invokes a server-side reducer by name, passing an optional array of arguments.
+			</description>
+		</method>
+		<method name="subscribe">
+			<return type="int" enum="Error" />
+			<param index="0" name="queries" type="PackedStringArray" />
+			<description>
+				Subscribes to one or more SQL queries. The server will push the initial matching rows and keep the local cache updated in real time.
+			</description>
+		</method>
+		<method name="get_table">
+			<return type="SpacetimeDBTable" />
+			<param index="0" name="name" type="String" />
+			<description>
+				Returns the local [SpacetimeDBTable] cache for the given table name, or null if the table has not been seen.
+			</description>
+		</method>
+		<method name="has_table">
+			<return type="bool" />
+			<param index="0" name="name" type="String" />
+			<description>
+				Returns [code]true[/code] if a table with the given name exists in the local cache.
+			</description>
+		</method>
+		<method name="get_table_names">
+			<return type="PackedStringArray" />
+			<description>
+				Returns the names of all tables currently in the local cache.
+			</description>
+		</method>
+		<method name="register_table">
+			<return type="SpacetimeDBTable" />
+			<param index="0" name="name" type="String" />
+			<description>
+				Pre-registers a table by name so its schema can be configured before data arrives.
+			</description>
+		</method>
+		<method name="is_connected_to_database">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if the client is currently connected.
+			</description>
+		</method>
+		<method name="get_identity">
+			<return type="SpacetimeDBIdentity" />
+			<description>
+				Returns the [SpacetimeDBIdentity] assigned by the server after connecting.
+			</description>
+		</method>
+		<method name="get_auth_token">
+			<return type="String" />
+			<description>
+				Returns the authentication token received from the server. Save this for reconnecting with the same identity.
+			</description>
+		</method>
+		<method name="get_connection_id">
+			<return type="String" />
+			<description>
+				Returns the connection ID assigned by the server for this session.
+			</description>
+		</method>
+	</methods>
+	<signals>
+		<signal name="connected">
+			<param index="0" name="identity" type="SpacetimeDBIdentity" />
+			<param index="1" name="token" type="String" />
+			<description>
+				Emitted when the connection is fully established and the server has provided an identity and token.
+			</description>
+		</signal>
+		<signal name="disconnected">
+			<description>
+				Emitted when the connection is closed.
+			</description>
+		</signal>
+		<signal name="connection_error">
+			<param index="0" name="error" type="String" />
+			<description>
+				Emitted when a connection error occurs.
+			</description>
+		</signal>
+		<signal name="identity_received">
+			<param index="0" name="identity" type="SpacetimeDBIdentity" />
+			<param index="1" name="token" type="String" />
+			<param index="2" name="connection_id" type="String" />
+			<description>
+				Emitted when the server sends the IdentityToken message with the full identity, auth token, and connection ID.
+			</description>
+		</signal>
+		<signal name="subscription_applied">
+			<description>
+				Emitted when the initial subscription data has been fully loaded into the local cache.
+			</description>
+		</signal>
+		<signal name="reducer_called">
+			<param index="0" name="reducer_name" type="String" />
+			<param index="1" name="status" type="String" />
+			<param index="2" name="message" type="String" />
+			<description>
+				Emitted when a reducer call result is received. [param status] is "committed", "failed", or "out_of_energy".
+			</description>
+		</signal>
+		<signal name="row_inserted">
+			<param index="0" name="table_name" type="String" />
+			<param index="1" name="row" type="Dictionary" />
+			<description>
+				Emitted when a new row is inserted into a subscribed table.
+			</description>
+		</signal>
+		<signal name="row_deleted">
+			<param index="0" name="table_name" type="String" />
+			<param index="1" name="row" type="Dictionary" />
+			<description>
+				Emitted when a row is deleted from a subscribed table.
+			</description>
+		</signal>
+		<signal name="row_updated">
+			<param index="0" name="table_name" type="String" />
+			<param index="1" name="old_row" type="Dictionary" />
+			<param index="2" name="new_row" type="Dictionary" />
+			<description>
+				Emitted when a row in a subscribed table is updated.
+			</description>
+		</signal>
+		<signal name="event_received">
+			<param index="0" name="event_data" type="Dictionary" />
+			<description>
+				Emitted for every raw message received from the server, useful for debugging or handling custom protocol extensions.
+			</description>
+		</signal>
+	</signals>
+	<constants>
+		<constant name="STATE_DISCONNECTED" value="0" enum="ConnectionState">
+			The client is not connected.
+		</constant>
+		<constant name="STATE_CONNECTING" value="1" enum="ConnectionState">
+			The client is establishing a WebSocket connection.
+		</constant>
+		<constant name="STATE_CONNECTED" value="2" enum="ConnectionState">
+			The client is connected and ready.
+		</constant>
+		<constant name="STATE_CLOSING" value="3" enum="ConnectionState">
+			The connection is being closed.
+		</constant>
+		<constant name="PROTOCOL_JSON" value="0" enum="Protocol">
+			Use the JSON text WebSocket protocol (v1.json.spacetimedb).
+		</constant>
+		<constant name="PROTOCOL_BSATN" value="1" enum="Protocol">
+			Use the binary BSATN WebSocket protocol (v1.bsatn.spacetimedb).
+		</constant>
+	</constants>
+</class>

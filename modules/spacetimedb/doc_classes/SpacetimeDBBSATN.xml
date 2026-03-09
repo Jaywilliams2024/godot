@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpacetimeDBBSATN" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+	<brief_description>
+		Utility class for SpacetimeDB BSATN binary serialization.
+	</brief_description>
+	<description>
+		SpacetimeDBBSATN provides static helper methods for encoding and decoding data in SpacetimeDB's Binary Serialization and Algebraic Type Notation (BSATN) format. All multi-byte integers are little-endian. Strings and byte arrays are prefixed with a u32 length.
+	</description>
+	<tutorials>
+		<link title="BSATN Format">https://spacetimedb.com/docs/bsatn</link>
+	</tutorials>
+	<methods>
+		<method name="encode_bool" qualifiers="static">
+			<return type="PackedByteArray" />
+			<param index="0" name="value" type="bool" />
+			<description>Encodes a boolean as 1 byte (0 or 1).</description>
+		</method>
+		<method name="encode_u32" qualifiers="static">
+			<return type="PackedByteArray" />
+			<param index="0" name="value" type="int" />
+			<description>Encodes an unsigned 32-bit integer in little-endian.</description>
+		</method>
+		<method name="encode_i64" qualifiers="static">
+			<return type="PackedByteArray" />
+			<param index="0" name="value" type="int" />
+			<description>Encodes a signed 64-bit integer in little-endian.</description>
+		</method>
+		<method name="encode_f64" qualifiers="static">
+			<return type="PackedByteArray" />
+			<param index="0" name="value" type="float" />
+			<description>Encodes a 64-bit float (IEEE 754) in little-endian.</description>
+		</method>
+		<method name="encode_string" qualifiers="static">
+			<return type="PackedByteArray" />
+			<param index="0" name="value" type="String" />
+			<description>Encodes a UTF-8 string with a u32 length prefix.</description>
+		</method>
+		<method name="encode_bytes" qualifiers="static">
+			<return type="PackedByteArray" />
+			<param index="0" name="value" type="PackedByteArray" />
+			<description>Encodes raw bytes with a u32 length prefix.</description>
+		</method>
+		<method name="encode_variant" qualifiers="static">
+			<return type="PackedByteArray" />
+			<param index="0" name="value" type="Variant" />
+			<description>Encodes a Variant using automatic BSATN type mapping.</description>
+		</method>
+		<method name="decode_bool" qualifiers="static">
+			<return type="bool" />
+			<param index="0" name="data" type="PackedByteArray" />
+			<param index="1" name="offset" type="int" />
+			<description>Decodes a boolean from a byte at the given offset.</description>
+		</method>
+		<method name="decode_u32" qualifiers="static">
+			<return type="int" />
+			<param index="0" name="data" type="PackedByteArray" />
+			<param index="1" name="offset" type="int" />
+			<description>Decodes an unsigned 32-bit integer from the given offset.</description>
+		</method>
+		<method name="decode_i64" qualifiers="static">
+			<return type="int" />
+			<param index="0" name="data" type="PackedByteArray" />
+			<param index="1" name="offset" type="int" />
+			<description>Decodes a signed 64-bit integer from the given offset.</description>
+		</method>
+		<method name="decode_f64" qualifiers="static">
+			<return type="float" />
+			<param index="0" name="data" type="PackedByteArray" />
+			<param index="1" name="offset" type="int" />
+			<description>Decodes a 64-bit float from the given offset.</description>
+		</method>
+		<method name="decode_string" qualifiers="static">
+			<return type="String" />
+			<param index="0" name="data" type="PackedByteArray" />
+			<param index="1" name="offset" type="int" />
+			<description>Decodes a length-prefixed UTF-8 string from the given offset.</description>
+		</method>
+		<method name="decode_bytes" qualifiers="static">
+			<return type="PackedByteArray" />
+			<param index="0" name="data" type="PackedByteArray" />
+			<param index="1" name="offset" type="int" />
+			<description>Decodes a length-prefixed byte array from the given offset.</description>
+		</method>
+		<method name="string_byte_length" qualifiers="static">
+			<return type="int" />
+			<param index="0" name="data" type="PackedByteArray" />
+			<param index="1" name="offset" type="int" />
+			<description>Returns the total byte length of a BSATN-encoded string (4-byte prefix + payload).</description>
+		</method>
+	</methods>
+</class>
