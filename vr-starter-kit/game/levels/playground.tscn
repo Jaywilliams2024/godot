@@ -1,0 +1,183 @@
+[gd_scene load_steps=31 format=3]
+
+[ext_resource type="PackedScene" uid="uid://qbmx03iibuuu" path="res://addons/godot-xr-tools/staging/scene_base.tscn" id="1_base"]
+[ext_resource type="Script" path="res://game/levels/playground.gd" id="2_script"]
+[ext_resource type="PackedScene" uid="uid://b228p8k6sonve" path="res://addons/godot-xr-tools/player/fade/fade_collision.tscn" id="3_fade"]
+[ext_resource type="PackedScene" uid="uid://b4kad2kuba1yn" path="res://addons/godot-xr-tools/hands/scenes/lowpoly/left_hand_low.tscn" id="4_lhand"]
+[ext_resource type="PackedScene" uid="uid://l2n30mpbkdyw" path="res://addons/godot-xr-tools/hands/scenes/lowpoly/right_hand_low.tscn" id="5_rhand"]
+[ext_resource type="PackedScene" uid="uid://bl2nuu3qhlb5k" path="res://addons/godot-xr-tools/functions/movement_direct.tscn" id="6_direct"]
+[ext_resource type="PackedScene" uid="uid://b6bk2pj8vbj28" path="res://addons/godot-xr-tools/functions/movement_turn.tscn" id="7_turn"]
+[ext_resource type="PackedScene" uid="uid://c2q5phg8w08o" path="res://addons/godot-xr-tools/functions/movement_jump.tscn" id="8_jump"]
+[ext_resource type="PackedScene" uid="uid://bxm1ply47vaan" path="res://addons/godot-xr-tools/functions/movement_climb.tscn" id="9_climb"]
+[ext_resource type="PackedScene" uid="uid://b4ysuy43poobf" path="res://addons/godot-xr-tools/functions/function_pickup.tscn" id="10_pickup"]
+[ext_resource type="PackedScene" uid="uid://fiul51tsyoop" path="res://addons/godot-xr-tools/functions/function_teleport.tscn" id="11_teleport"]
+[ext_resource type="PackedScene" uid="uid://cqhw276realc" path="res://addons/godot-xr-tools/functions/function_pointer.tscn" id="12_pointer"]
+[ext_resource type="PackedScene" uid="uid://diyu06cw06syv" path="res://addons/godot-xr-tools/player/player_body.tscn" id="13_body"]
+[ext_resource type="PackedScene" uid="uid://dpy1eg3i331se" path="res://addons/godot-xr-tools/objects/teleport_area.tscn" id="14_teleparea"]
+[ext_resource type="PackedScene" uid="uid://clujaf3u776a3" path="res://addons/godot-xr-tools/objects/viewport_2d_in_3d.tscn" id="15_vp2d"]
+[ext_resource type="PackedScene" uid="uid://ce7vysyvondf8" path="res://addons/godot-xr-tools/objects/snap_zone.tscn" id="16_snap"]
+[ext_resource type="PackedScene" path="res://game/objects/grab_cube.tscn" id="17_cube"]
+[ext_resource type="PackedScene" path="res://game/objects/grab_ball.tscn" id="18_ball"]
+[ext_resource type="PackedScene" path="res://game/objects/climbing_wall.tscn" id="19_wall"]
+[ext_resource type="PackedScene" path="res://game/ui/vr_menu.tscn" id="20_menu"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
+sky_top_color = Color(0.25, 0.45, 0.7, 1)
+sky_horizon_color = Color(0.65, 0.72, 0.78, 1)
+ground_bottom_color = Color(0.2, 0.18, 0.16, 1)
+ground_horizon_color = Color(0.65, 0.72, 0.78, 1)
+
+[sub_resource type="Sky" id="Sky_main"]
+sky_material = SubResource("ProceduralSkyMaterial_sky")
+
+[sub_resource type="Environment" id="Environment_main"]
+background_mode = 2
+sky = SubResource("Sky_main")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
+albedo_color = Color(0.35, 0.42, 0.38, 1)
+roughness = 0.85
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_floor"]
+material = SubResource("StandardMaterial3D_floor")
+size = Vector2(30, 30)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(30, 0.2, 30)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_table"]
+albedo_color = Color(0.5, 0.35, 0.22, 1)
+roughness = 0.7
+
+[sub_resource type="BoxMesh" id="BoxMesh_table"]
+material = SubResource("StandardMaterial3D_table")
+size = Vector3(1.6, 0.8, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_table"]
+size = Vector3(1.6, 0.8, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_telepad"]
+albedo_color = Color(0.3, 0.9, 0.6, 1)
+emission_enabled = true
+emission = Color(0.2, 0.8, 0.5, 1)
+emission_energy_multiplier = 0.6
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_telepad"]
+material = SubResource("StandardMaterial3D_telepad")
+top_radius = 0.8
+bottom_radius = 0.8
+height = 0.05
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_telearea"]
+radius = 0.8
+height = 1.0
+
+[node name="Playground" instance=ExtResource("1_base")]
+script = ExtResource("2_script")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." index="0"]
+environment = SubResource("Environment_main")
+
+[node name="Sun" type="DirectionalLight3D" parent="." index="0"]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 10, 0)
+shadow_enabled = true
+
+[node name="FadeCollision" parent="XROrigin3D/XRCamera3D" index="0" instance=ExtResource("3_fade")]
+
+[node name="LeftHand" parent="XROrigin3D" index="1"]
+pose = &"grip"
+show_when_tracked = true
+
+[node name="LeftHandModel" parent="XROrigin3D/LeftHand" index="0" instance=ExtResource("4_lhand")]
+
+[node name="MovementDirect" parent="XROrigin3D/LeftHand" index="1" instance=ExtResource("6_direct")]
+strafe = true
+
+[node name="MovementJump" parent="XROrigin3D/LeftHand" index="2" instance=ExtResource("8_jump")]
+jump_button_action = "ax_button"
+
+[node name="FunctionPickup" parent="XROrigin3D/LeftHand" index="3" instance=ExtResource("10_pickup")]
+
+[node name="FunctionTeleport" parent="XROrigin3D/LeftHand" index="4" instance=ExtResource("11_teleport")]
+
+[node name="RightHand" parent="XROrigin3D" index="2"]
+pose = &"grip"
+show_when_tracked = true
+
+[node name="RightHandModel" parent="XROrigin3D/RightHand" index="0" instance=ExtResource("5_rhand")]
+
+[node name="MovementDirect" parent="XROrigin3D/RightHand" index="1" instance=ExtResource("6_direct")]
+
+[node name="MovementTurn" parent="XROrigin3D/RightHand" index="2" instance=ExtResource("7_turn")]
+
+[node name="FunctionPickup" parent="XROrigin3D/RightHand" index="3" instance=ExtResource("10_pickup")]
+
+[node name="FunctionPointer" parent="XROrigin3D/RightHand" index="4" instance=ExtResource("12_pointer")]
+
+[node name="MovementClimb" parent="XROrigin3D" index="3" instance=ExtResource("9_climb")]
+
+[node name="PlayerBody" parent="XROrigin3D" index="4" instance=ExtResource("13_body")]
+
+[node name="Floor" type="StaticBody3D" parent="." index="0"]
+collision_layer = 1
+collision_mask = 0
+
+[node name="FloorMesh" type="MeshInstance3D" parent="Floor" index="0"]
+mesh = SubResource("PlaneMesh_floor")
+
+[node name="FloorShape" type="CollisionShape3D" parent="Floor" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+shape = SubResource("BoxShape3D_floor")
+
+[node name="Table" type="StaticBody3D" parent="." index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, -1.5)
+collision_layer = 1
+collision_mask = 0
+
+[node name="TableMesh" type="MeshInstance3D" parent="Table" index="0"]
+mesh = SubResource("BoxMesh_table")
+
+[node name="TableShape" type="CollisionShape3D" parent="Table" index="1"]
+shape = SubResource("BoxShape3D_table")
+
+[node name="GrabCube" parent="." index="0" instance=ExtResource("17_cube")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 1.0, -1.5)
+
+[node name="GrabCube2" parent="." index="0" instance=ExtResource("17_cube")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, -1.5)
+item_id = "grab_cube_2"
+
+[node name="GrabBall" parent="." index="0" instance=ExtResource("18_ball")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 1.0, -1.5)
+
+[node name="SnapZone" parent="." index="0" instance=ExtResource("16_snap")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0.95, -1.3)
+
+[node name="ClimbingWall" parent="." index="0" instance=ExtResource("19_wall")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, -6)
+
+[node name="TeleportPad" type="MeshInstance3D" parent="." index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.03, -3)
+mesh = SubResource("CylinderMesh_telepad")
+
+[node name="TeleportTarget" type="Marker3D" parent="." index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 3)
+
+[node name="TeleportPadTarget" type="MeshInstance3D" parent="." index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.03, 3)
+mesh = SubResource("CylinderMesh_telepad")
+
+[node name="TeleportArea" parent="." index="0" instance=ExtResource("14_teleparea")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.5, -3)
+target = NodePath("../TeleportTarget")
+
+[node name="TeleportAreaShape" type="CollisionShape3D" parent="TeleportArea" index="0"]
+shape = SubResource("CylinderShape3D_telearea")
+
+[node name="MenuViewport" parent="." index="0" instance=ExtResource("15_vp2d")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 1.6, 3.5)
+screen_size = Vector2(1.5, 1.0)
+scene = ExtResource("20_menu")
+viewport_size = Vector2(768, 512)
